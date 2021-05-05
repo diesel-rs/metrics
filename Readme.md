@@ -40,9 +40,9 @@ This repository contains the numbers collected by diesel continuous scheduled be
 
 #### Medium complex queries
 
-![Postgresql](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/medium_complex_query_postgres.svg)
-![Sqlite](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/medium_complex_query_sqlite.svg)
-![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/medium_complex_query_mysql.svg)
+![Postgresql](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/medium_complex_postgres.svg)
+![Sqlite](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/medium_complex_sqlite.svg)
+![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/medium_complex_mysql.svg)
 
 #### Associations
 
@@ -63,3 +63,11 @@ This repository contains the numbers collected by diesel continuous scheduled be
 * [Sqlite](https://github.com/diesel-rs/metrics/blob/results/aggregated_data/sqlite.csv)
 * [Mysql](https://github.com/diesel-rs/metrics/blob/results/aggregated_data/mysql.csv)
 
+## How to generate the plots from the data
+
+```sh
+git clone https://github.com/diesel-rs/metrics/tree/results
+R << analytics.R
+```
+
+The plots are generated inside the `plots` directory. The `aggregated_data` directory contains a summary of the raw criterion results collected in `metrics`
