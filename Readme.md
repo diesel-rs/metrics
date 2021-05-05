@@ -57,7 +57,7 @@ This repository contains the numbers collected by diesel continuous scheduled be
 ![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/timeline/insert_mysql.svg)
 
 
-## Raw data aggregated data
+## Raw aggregated data
 
 * [Postgresql](https://github.com/diesel-rs/metrics/blob/results/aggregated_data/postgres.csv)
 * [Sqlite](https://github.com/diesel-rs/metrics/blob/results/aggregated_data/sqlite.csv)
