@@ -33,4 +33,4 @@ jobs:
           git checkout -b results
           git add aggregated_data plots
           git -c user.name=Bot -c user.email=dummy@example.com commit --message "Update plots"
-          git push --set-upstream origin results
+          git push --set-upstream origin results --force
