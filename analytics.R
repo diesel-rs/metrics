@@ -10,6 +10,7 @@ files <- list.files(path = paste(base_path, "metrics", sep="/"), pattern="*.csv"
 files <- files[grep("*/new/raw.csv$", files)]
 
 extract_version_folder <- function(x) {
+  x = str_replace(x, base_path, "")
   return(str_split(x, fixed("/"))[[1]][3])
 }
 
@@ -29,25 +30,7 @@ extract_commit <- function(x) {
   return(substr(x, 17, 56))
 }
 
-calculate_time_relative_to_diesel <- function (times, group, names) {
-  if (group == "bench_insert") {
-    idx <- which(names == "diesel")
-    return(times/times[idx])
-  } else if (group == "bench_loading_associations_sequentially") {
-    idx <- which(names == "diesel/bench_loading_associations_sequentially")
-    return(times/times[idx])
-  } else if (group == "bench_medium_complex_query") {
-    idx <- which(names == "diesel")
-    return(times/times[idx])
-  } else if (group == "bench_trivial_query") {
-    idx <- which(names == "diesel")
-    return(times/times[idx])
-  } else {
-    stop(paste("Unknown group:", group))
-  }
-}
-
-data = map_df(files, function(x) read.csv(paste(base_path, x, sep="/")) %>% mutate(backend = extract_backend(x), timestamp = extract_timestamp(x), commit = extract_commit(x))) 
+data = map_df(files, function(x) read.csv(x) %>% mutate(backend = extract_backend(x), timestamp = extract_timestamp(x), commit = extract_commit(x))) 
 data$measured_time = data$sample_measured_value / data$iteration_count
 names(data)[2] <- "benchmark_name"
 data$backend = as.factor(data$backend)
@@ -57,107 +40,136 @@ aggregated_data = data %>% group_by(group, benchmark_name, value, timestamp, bac
   summarise(mean_time = mean(measured_time),
             min_time = min(measured_time),
             max_time = max(measured_time)) %>%
-  select(group, benchmark_name,value, timestamp, backend, commit, mean_time, max_time, min_time) %>% 
-  group_by(group, value, timestamp, backend, commit) %>%
-  mutate(relative_to_diesel = calculate_time_relative_to_diesel(mean_time, group[1], benchmark_name))
+  select(group, benchmark_name,value, timestamp, backend, commit, mean_time, max_time, min_time)
 
-create_plots <- function(data, backend_value) {
+create_box_plots <- function(data, backend_value, time_stamp) {
+    data = data %>% filter(backend == backend_value & timestamp == time_stamp)
+    plot_path = paste(base_path, "/plots/", sep = "");
+    names(data)[2] <- "Benchmark"
+    commit = data$commit[1]
+    ncol = 3
+    
+    width = 10
+    height = 8
+    
+    insert = ggplot(data %>% filter(group == "bench_insert"),
+           aes(x = Benchmark, y = measured_time, fill = Benchmark, group = Benchmark)) +
+      geom_boxplot() +
+      facet_wrap(~value, scales = "free_y", ncol = ncol) +
+      xlab(label = "Benchmark") +
+      ylab(label = "Time [ns]") +
+      theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "bottom") +
+      labs(title = paste("Insert (", backend_value, ") ", sep = ""),
+           subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
+    
+    ggsave(paste(plot_path, "summary/insert_", backend_value, ".svg", sep = ""), plot = insert, width = width, height = height)
+    
+    query_simple = ggplot(data %>% filter(group == "bench_trivial_query"),
+                    aes(x = Benchmark, y = measured_time, fill = Benchmark, group = Benchmark)) +
+      geom_boxplot() +
+      facet_wrap(~value, scales = "free_y", ncol = ncol) +
+      xlab(label = "Benchmark") +
+      ylab(label = "Time [ns]") +
+      theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "bottom") +
+      labs(title = paste("Trivial query (", backend_value, ") ", sep = ""),
+           subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
+    
+    ggsave(paste(plot_path, "summary/trivial_query_", backend_value, ".svg", sep = ""), plot = query_simple, width = width, height = height)
+    
+    query_medium = ggplot(data %>% filter(group == "bench_medium_complex_query"),
+                          aes(x = Benchmark, y = measured_time, fill = Benchmark, group = Benchmark)) +
+      geom_boxplot() +
+      facet_wrap(~value, scales = "free_y", ncol = ncol) +
+      xlab(label = "Benchmark") +
+      ylab(label = "Time [ns]") +
+      theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(), 
+            legend.position = "bottom") +
+      labs(title = paste("Medium complex query (", backend_value, ") ", sep = ""),
+           subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
+    
+    ggsave(paste(plot_path, "summary/medium_complex_query_", backend_value, ".svg", sep = ""), plot = query_medium, width = width, height = height)
+    
+    associations = ggplot(data %>% filter(group == "bench_loading_associations_sequentially"),
+                          aes(x = Benchmark, y = measured_time, fill = Benchmark, group = Benchmark)) +
+      geom_boxplot() +
+      xlab(label = "Benchmark") +
+      ylab(label = "Time [ns]") +
+      theme(axis.title.x=element_blank(),
+            axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            legend.position = "bottom") +
+      labs(title = paste("Associations (", backend_value, ") ", sep = ""),
+           subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
+    
+    ggsave(paste(plot_path, "summary/associations_", backend_value, ".svg", sep = ""), plot = associations, width = width, height = width)
+}
+
+max_date = data %>% group_by(backend) %>% summarise(timestamp = max(timestamp))
+create_box_plots(data, max_date$backend[1], max_date$timestamp[1])
+create_box_plots(data, max_date$backend[2], max_date$timestamp[2])
+create_box_plots(data, max_date$backend[3], max_date$timestamp[3])
+
+create_time_line <- function(data, backend_value) {
   backend_data = data %>% filter(backend == backend_value)
   names(backend_data)[2] = "Benchmark"
   csv_path = paste(base_path, "/aggregated_data/", backend_value, ".csv", sep = "")
   write.csv(backend_data, file = csv_path)
   plot_path = paste(base_path, "/plots/", sep = "");
+  date = max(backend_data$timestamp)
+  
+  width = 10
+  height = 8
+  ncol = 3
   
   
   insert = ggplot(backend_data %>% filter(group == "bench_insert"),
                   aes(x=timestamp, y = mean_time, color = Benchmark)) +
-    geom_line() + geom_point() + facet_wrap(~ value, scales = "free_y") +
+    geom_line() + geom_point() + facet_wrap(~ value, scales = "free_y", ncol = ncol) +
     labs(title = paste("Insert over time (", backend_value, ")", sep = ""),
+         subtitle = as.character(date),
          y = "Time (ns)") +
-    geom_errorbar(aes(ymin = min_time, ymax = max_time), width=.1,
-                  position=position_dodge(0.005))
-  ggsave(paste(plot_path, "/timeline/insert_", backend_value, ".svg", sep = ""), plot = insert)
+    theme(legend.position = "bottom")
+  ggsave(paste(plot_path, "/timeline/insert_", backend_value, ".svg", sep = ""), plot = insert, width = width, height = height)
   
   simple_query = ggplot(backend_data %>% filter(group == "bench_trivial_query"),
                   aes(x=timestamp, y = mean_time, color = Benchmark)) +
-    geom_line() + geom_point() + facet_wrap(~ value, scales = "free_y") +
+    geom_line() + geom_point() + facet_wrap(~ value, scales = "free_y", ncol = ncol) +
     labs(title = paste("Trivial query over time (", backend_value, ")", sep = ""),
+         subtitle = as.character(date),
          y = "Time (ns)") +
-    geom_errorbar(aes(ymin = min_time, ymax = max_time), width=.1,
-                  position=position_dodge(0.005))
+    theme(legend.position = "bottom")
   
-  ggsave(paste(plot_path, "/timeline/trivial_query_", backend_value, ".svg", sep = ""), plot = simple_query)
+  ggsave(paste(plot_path, "/timeline/trivial_query_", backend_value, ".svg", sep = ""), plot = simple_query, width = width, height = height)
   
   medium_complex = ggplot(backend_data %>% filter(group == "bench_medium_complex_query"),
                   aes(x=timestamp, y = mean_time, color = Benchmark)) +
-    geom_line() + geom_point() + facet_wrap(~ value, scales = "free_y") +
+    geom_line() + geom_point() + facet_wrap(~ value, scales = "free_y", ncol = ncol) +
     labs(title = paste("Medium complex query over time (", backend_value, ")", sep = ""),
-         y = "Time (ns)") +
-    geom_errorbar(aes(ymin = min_time, ymax = max_time), width=.1,
-                  position=position_dodge(0.005))
+         subtitle = as.character(date),
+         y = "Time (ns)")+
+    theme(legend.position = "bottom")
   
-  ggsave(paste(plot_path, "/timeline/medium_complex_", backend_value, ".svg", sep = ""), plot = medium_complex)
+  ggsave(paste(plot_path, "/timeline/medium_complex_", backend_value, ".svg", sep = ""), plot = medium_complex, width = width, height = height)
   
   associations = ggplot(backend_data %>% filter(group == "bench_loading_associations_sequentially"),
                   aes(x=timestamp, y = mean_time, color = Benchmark)) +
     geom_line() + geom_point() +
     labs(title = paste("Associations over time (", backend_value, ")", sep = ""),
+         subtitle = as.character(date),
          y = "Time (ns)") +
-    geom_errorbar(aes(ymin = min_time, ymax = max_time), width=.1,
-                  position=position_dodge(0.005))
+    theme(legend.position = "bottom")
   
-  ggsave(paste(plot_path, "/timeline/associations_", backend_value, ".svg", sep = ""), plot = associations)
-  
-  
-  # build bar charts with relative times for the current version
-  max_date = max(backend_data$timestamp)
-  backend_data = backend_data %>% filter(timestamp >= max_date)
-  
-  insert = ggplot(backend_data %>% filter(group == "bench_insert") , 
-                  aes(x = Benchmark, y = relative_to_diesel, fill = Benchmark))+
-    geom_bar(stat = "identity") + facet_wrap(~value) +
-    labs(title = paste("Inserts (", backend_value, ")", sep = ""),
-         y = "Time relative to diesel") + 
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-  
-  ggsave(paste(plot_path, "summary/insert_", backend_value, ".svg", sep = ""), plot = insert)
-  
-  simple_query = ggplot(backend_data %>% filter(group == "bench_trivial_query") , 
-                        aes(x = Benchmark, y = relative_to_diesel, fill = Benchmark))+
-    geom_bar(stat = "identity") + facet_wrap(~value) +
-    labs(title = paste("Simple Query (", backend_value, ")", sep = ""),
-         y = "Time relative to diesel") + 
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-  
-  ggsave(paste(plot_path, "summary/trivial_query_", backend_value, ".svg", sep = ""), plot = simple_query)
-  
-  medium_complex_query = ggplot(backend_data %>% filter(group == "bench_medium_complex_query") , 
-                        aes(x = Benchmark, y = relative_to_diesel, fill = Benchmark))+
-    geom_bar(stat = "identity") + facet_wrap(~value) +
-    labs(title = paste("Medium Complex Query (", backend_value, ")", sep = ""),
-         y = "Time relative to diesel") +
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-  
-  ggsave(paste(plot_path, "summary/medium_complex_query_", backend_value, ".svg", sep = ""), plot = medium_complex_query)
-  
-  associations = ggplot(backend_data %>% filter(group == "bench_loading_associations_sequentially"),
-         aes(x = Benchmark, y = relative_to_diesel, fill = Benchmark)) +
-    geom_bar(stat = "identity") +
-    labs(title = paste("Associations (", backend_value, ")", sep = ""),
-         y = "Time relative to diesel") +
-    theme(axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
-  
-  ggsave(paste(plot_path, "summary/associations_", backend_value, ".svg", sep = ""), plot = associations)
+  ggsave(paste(plot_path, "/timeline/associations_", backend_value, ".svg", sep = ""), plot = associations, width = width, height = height)
 }
  
-create_plots(aggregated_data, "postgres")
-create_plots(aggregated_data, "sqlite")
-create_plots(aggregated_data, "mysql")
+create_time_line(aggregated_data, "postgres")
+create_time_line(aggregated_data, "sqlite")
+create_time_line(aggregated_data, "mysql")
