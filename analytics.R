@@ -59,8 +59,6 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            axis.ticks.x=element_blank(),
             legend.position = "bottom") +
       labs(title = paste("Insert (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
@@ -74,8 +72,6 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            axis.ticks.x=element_blank(),
             legend.position = "bottom") +
       labs(title = paste("Trivial query (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
@@ -89,8 +85,6 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            axis.ticks.x=element_blank(), 
             legend.position = "bottom") +
       labs(title = paste("Medium complex query (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
@@ -103,8 +97,6 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
-            axis.text.x=element_blank(),
-            axis.ticks.x=element_blank(),
             legend.position = "bottom") +
       labs(title = paste("Associations (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
