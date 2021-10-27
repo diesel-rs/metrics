@@ -50,7 +50,7 @@ create_box_plots <- function(data, backend_value, time_stamp) {
     ncol = 3
     
     width = 10
-    height = 8
+    height = 10
     
     insert = ggplot(data %>% filter(group == "bench_insert"),
            aes(x = Benchmark, y = measured_time, fill = Benchmark, group = Benchmark)) +
@@ -59,6 +59,7 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
+	    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
             legend.position = "bottom") +
       labs(title = paste("Insert (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
@@ -72,6 +73,7 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
+	    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
             legend.position = "bottom") +
       labs(title = paste("Trivial query (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
@@ -85,6 +87,7 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
+	    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
             legend.position = "bottom") +
       labs(title = paste("Medium complex query (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
@@ -97,6 +100,7 @@ create_box_plots <- function(data, backend_value, time_stamp) {
       xlab(label = "Benchmark") +
       ylab(label = "Time [ns]") +
       theme(axis.title.x=element_blank(),
+	    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
             legend.position = "bottom") +
       labs(title = paste("Associations (", backend_value, ") ", sep = ""),
            subtitle = paste(time_stamp, " (", commit, ")", sep = ""))
