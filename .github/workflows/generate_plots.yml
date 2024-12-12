@@ -26,6 +26,11 @@ jobs:
           R -e 'install.packages("stringr")'
           R -e 'install.packages("ggplot2")'
           R -e 'install.packages("svglite")'
+          R -e 'install.packages("tidyr")'
+          R -e 'install.packages("ggpubr")'
+          R -e 'install.packages("gt")'
+          R -e 'install.packages("gtExtras")'
+          R -e 'install.packages("scales")'
       - name: Run R srcipt
         run: |
           mkdir -p plots/summary
