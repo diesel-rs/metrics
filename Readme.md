@@ -9,26 +9,58 @@ This repository contains the numbers collected by diesel continuous scheduled be
 #### Trivial queries
 
 ![Postgresql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/trivial_query_postgres.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_trivial_query_postgres.html)
+
 ![Sqlite](https://github.com/diesel-rs/metrics/raw/results/plots/summary/trivial_query_sqlite.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_trivial_query_sqlite.html)
+
 ![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/trivial_query_mysql.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_trivial_query_mysql.html)
 
 #### Medium complex queries
 
 ![Postgresql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/medium_complex_query_postgres.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_medium_complex_query_postgres.html)
+
 ![Sqlite](https://github.com/diesel-rs/metrics/raw/results/plots/summary/medium_complex_query_sqlite.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_medium_complex_query_sqlite.html)
+
 ![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/medium_complex_query_mysql.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_medium_complex_query_mysql.html)
 
 #### Associations
 
 ![Postgresql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/associations_postgres.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_loading_associations_sequentially_postgres.html)
+
 ![Sqlite](https://github.com/diesel-rs/metrics/raw/results/plots/summary/associations_sqlite.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_loading_associations_sequentially_sqlite.html)
+
 ![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/associations_mysql.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_loading_associations_sequentially_mysql.html)
 
 #### Inserts
 
 ![Postgresql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/insert_postgres.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_insert_postgres.html)
+
 ![Sqlite](https://github.com/diesel-rs/metrics/raw/results/plots/summary/insert_sqlite.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_insert_sqlite.html)
+
 ![Mysql](https://github.com/diesel-rs/metrics/raw/results/plots/summary/insert_mysql.svg)
+
+[Result Table](https://htmlpreview.github.io/?https://github.com/diesel-rs/metrics/blob/results/plots/table_bench_insert_mysql.html)
 
 ### Performance over time
 

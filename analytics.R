@@ -176,7 +176,7 @@ create_plots <- function(data, backend_value, time_stamp) {
     plot_facet_data(data, backend_value, time_stamp, "bench_trivial_query", "Trivial query", paste(plot_path, "summary/trivial_query_", backend_value, ".svg", sep = ""), width, height, plot_path, commit)
     plot_facet_data(data, backend_value, time_stamp, "bench_medium_complex_query", "Medium complex query", paste(plot_path, "summary/medium_complex_query_", backend_value, ".svg", sep = ""), width, height, plot_path, commit)
     plot_facet_data(data, backend_value, time_stamp, "bench_insert", "Insert", paste(plot_path, "summary/insert_", backend_value, ".svg", sep = ""), width, height, plot_path, commit)
-    plot_facet_data(data, backend_value, time_stamp, "bench_loading_associations_sequentially", "Associations", paste(plot_path, "summary/associations_", backend_value, ".svg", sep = ""), width, height, plot_path, commit)
+    plot_facet_data(data, backend_value, time_stamp, "bench_loading_associations_sequentially", "Associations", paste(plot_path, "summary/associations_", backend_value, ".svg", sep = ""), width, height / 5, plot_path, commit)
 }
 
 max_date = data %>% group_by(backend) %>% summarise(timestamp = max(timestamp))
